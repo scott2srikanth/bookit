@@ -1,0 +1,45 @@
+{
+  "name": "bookit",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1",
+    "build": "next build --webpack",
+    "start": "next start -H 127.0.0.1",
+    "lint": "eslint .",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "latest",
+    "@tiptap/extension-placeholder": "latest",
+    "@tiptap/react": "latest",
+    "@tiptap/starter-kit": "latest",
+    "ai": "latest",
+    "better-sqlite3": "latest",
+    "class-variance-authority": "latest",
+    "clsx": "latest",
+    "docx": "^9.7.1",
+    "drizzle-orm": "latest",
+    "jszip": "^3.10.1",
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "sonner": "latest",
+    "tailwind-merge": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "latest",
+    "@types/better-sqlite3": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "drizzle-kit": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest"
+  }
+}
