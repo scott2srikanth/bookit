@@ -1,49 +1,74 @@
-# BookIt
+# DigiKatha
 
-A polished, private, local-first book writing studio built with Next.js, Tailwind CSS, shadcn/ui conventions, Drizzle ORM, and embedded SQLite.
+**A sanctuary for every story.**
 
-## Features
+DigiKatha is a private, single-writer hub for shaping ideas, drafting manuscripts, preserving story worlds, and preparing books for publication. It uses Next.js, Tailwind CSS, shadcn/ui conventions, Drizzle ORM, Cloudflare Workers, and D1.
 
-- Guided book setup with an instant eight-chapter outline
-- Book library with live chapter and word-count progress
-- Distraction-free manuscript editor with local autosave
-- Automatic safety versions before large chapter changes
+## Highlights
+
+- Story shelf, guided setup, manuscript editor, autosave, and safety versions
 - Character, location, and continuity story bible
-- Publishing metadata and seven-keyword preparation
-- Standards-based EPUB, editable DOCX, and print/PDF export
-- Optional server-side OpenAI chapter drafting
-- Responsive professional interface with no analytics or cloud dependency
+- EPUB, editable DOCX, and print/PDF export
+- Optional AI drafting and Voice Muse dictation
+- Password-protected writer account with revocable sessions and login rate limiting
+- Cloudflare-compatible storage with no native Node.js database module or writable-filesystem dependency
 
-## Run locally
+## Local development
 
-Requirements: Node.js 22 LTS or newer.
+Requirements: Node.js 22 or newer.
 
 ```bash
 npm install
+cp .dev.vars.example .dev.vars
+npm run auth:hash-password
+```
+
+Put the generated value and your writer email in `.dev.vars`, then initialize and run the local D1 database:
+
+```bash
+npm run db:migrate:local
 npm run dev
 ```
 
-Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The server binds only to the local machine.
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000). `.dev.vars` is ignored by Git.
 
-## Optional AI
+## Cloudflare deployment
 
-Copy `.env.example` to `.env.local` and add an OpenAI API key:
-
-```env
-OPENAI_API_KEY=your_key
-```
-
-The key remains server-side. Manuscript text is sent to the provider only when **Draft with AI** is selected.
-
-## Data and backups
-
-The embedded database is created at `data/bookit.db`. Back up the whole `data` directory while BookIt is stopped. SQLite uses WAL journaling, foreign keys, a busy timeout, and query indexes.
-
-## Production check
+Authenticate Wrangler and create the production D1 database once:
 
 ```bash
-npm run build
-npm start
+npx wrangler login
+npx wrangler d1 create digikatha-db
 ```
 
-This application is intentionally designed for one author on one trusted computer. Do not expose it directly to the public internet without adding authentication and a reverse proxy.
+Copy the returned database ID into `wrangler.jsonc`, replacing `REPLACE_WITH_D1_DATABASE_ID`. Then configure production:
+
+```bash
+npm run db:migrate:remote
+npx wrangler secret put AUTH_EMAIL
+npx wrangler secret put AUTH_PASSWORD_HASH
+npm run deploy:cloudflare
+```
+
+Generate `AUTH_PASSWORD_HASH` with `npm run auth:hash-password`. To enable the optional AI and Whisper features, also run `npx wrangler secret put OPENAI_API_KEY`.
+
+Attach `book.skrdy.com` as a custom domain to the deployed `digikatha` Worker in Cloudflare. D1 is the only persistent application store; the Worker does not write to its local filesystem.
+
+## Security model
+
+- PBKDF2-SHA256 password hashing with a unique salt and 310,000 iterations
+- Random 256-bit session tokens; only SHA-256 token hashes are stored
+- Production `__Host-` cookie with `Secure`, `HttpOnly`, and `SameSite=Strict`
+- Origin validation for state-changing API calls and a safe same-site redirect policy
+- IP-derived, hashed login rate-limit keys with temporary lockout
+- Server-side secrets only; manuscript content reaches an AI provider only on an explicit AI action
+
+This is intentionally a single-writer application, not a multi-tenant account system.
+
+## Verification
+
+```bash
+npm run lint
+npm run build
+npm audit --omit=dev
+```

@@ -3,8 +3,11 @@ import { books, chapters } from "@/lib/db/schema";
 import { asc, eq } from "drizzle-orm";
 import { Document, HeadingLevel, Packer, Paragraph, TextRun } from "docx";
 import JSZip from "jszip";
+import { authorizeApi } from "@/lib/auth";
 
 export async function GET(req: Request, { params }: { params: Promise<{ bookId: string }> }) {
+  const denied = await authorizeApi(req, false);
+  if (denied) return denied;
   const { bookId } = await params;
   const format = new URL(req.url).searchParams.get("format");
   const book = (await db.select().from(books).where(eq(books.id, bookId)))[0];

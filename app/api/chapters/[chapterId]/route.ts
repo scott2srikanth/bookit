@@ -1,2 +1,23 @@
-import {db} from "@/lib/db";import {chapters,chapterVersions} from "@/lib/db/schema";import {eq} from "drizzle-orm";import {NextResponse} from "next/server";import {z} from "zod";
-const Input=z.object({content:z.string().max(2_000_000)});export async function PATCH(req:Request,{params}:{params:Promise<{chapterId:string}>}){const{chapterId}=await params;const parsed=Input.safeParse(await req.json());if(!parsed.success)return NextResponse.json({error:"Invalid content"},{status:400});const current=(await db.select().from(chapters).where(eq(chapters.id,chapterId)))[0];if(!current)return NextResponse.json({error:"Not found"},{status:404});if(current.content&&Math.abs(current.content.length-parsed.data.content.length)>500)await db.insert(chapterVersions).values({id:crypto.randomUUID(),chapterId,content:current.content,createdAt:new Date()});await db.update(chapters).set({content:parsed.data.content,status:parsed.data.content.length>100?"drafted":"planned",updatedAt:new Date()}).where(eq(chapters.id,chapterId));return NextResponse.json({ok:true})}
+import { db } from "@/lib/db";
+import { chapters, chapterVersions } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { authorizeApi } from "@/lib/auth";
+
+const Input = z.object({ content: z.string().max(2_000_000) });
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ chapterId: string }> }) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
+  const { chapterId } = await params;
+  const parsed = Input.safeParse(await request.json());
+  if (!parsed.success) return NextResponse.json({ error: "Invalid content" }, { status: 400 });
+  const current = (await db.select().from(chapters).where(eq(chapters.id, chapterId)))[0];
+  if (!current) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (current.content && Math.abs(current.content.length - parsed.data.content.length) > 500) {
+    await db.insert(chapterVersions).values({ id: crypto.randomUUID(), chapterId, content: current.content, createdAt: new Date() });
+  }
+  await db.update(chapters).set({ content: parsed.data.content, status: parsed.data.content.length > 100 ? "drafted" : "planned", updatedAt: new Date() }).where(eq(chapters.id, chapterId));
+  return NextResponse.json({ ok: true });
+}

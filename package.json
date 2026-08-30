@@ -1,22 +1,26 @@
 {
-  "name": "bookit",
+  "name": "digikatha",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev -H 127.0.0.1",
     "build": "next build --webpack",
     "start": "next start -H 127.0.0.1",
-    "lint": "eslint .",
-    "db:push": "drizzle-kit push",
-    "db:generate": "drizzle-kit generate"
+    "preview:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "db:migrate:local": "wrangler d1 migrations apply digikatha-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply digikatha-db --remote",
+    "auth:hash-password": "node scripts/hash-password.mjs",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@ai-sdk/openai": "latest",
+    "@opennextjs/cloudflare": "^1.20.4",
     "@tiptap/extension-placeholder": "latest",
     "@tiptap/react": "latest",
     "@tiptap/starter-kit": "latest",
     "ai": "latest",
-    "better-sqlite3": "latest",
     "class-variance-authority": "latest",
     "clsx": "latest",
     "docx": "^9.7.1",
@@ -32,14 +36,13 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "latest",
-    "@types/better-sqlite3": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "drizzle-kit": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
     "tailwindcss": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "wrangler": "^4.127.1"
   }
 }
