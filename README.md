@@ -68,7 +68,7 @@ Generate `AUTH_PASSWORD_HASH` with `npm run auth:hash-password`. To enable the o
 
 For dashboard deployments, `AUTH_EMAIL` and `APP_ORIGIN` are configured as non-sensitive Worker variables in `wrangler.jsonc`. Add only `AUTH_PASSWORD_HASH` under **Settings → Variables and Secrets** as an encrypted runtime secret.
 
-Attach `book.skrdy.com` as a custom domain to the deployed `digikatha` Worker in Cloudflare. D1 is the only persistent application store; the Worker does not write to its local filesystem.
+Attach `book.skrdy.com` as a custom domain to the deployed `bookit` Worker in Cloudflare. D1 is the only persistent application store; the Worker does not write to its local filesystem.
 
 ## Security model
 
