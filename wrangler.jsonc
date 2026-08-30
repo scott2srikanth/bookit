@@ -10,7 +10,8 @@
   },
   "observability": { "enabled": true },
   "vars": {
-    "APP_ORIGIN": "https://book.skrdy.com"
+    "APP_ORIGIN": "https://book.skrdy.com",
+    "AUTH_EMAIL": "srikanth@skrdy.com"
   },
   "d1_databases": [
     {
