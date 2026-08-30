@@ -89,8 +89,11 @@ export async function requireSession(returnTo = "/") {
 export async function destroySession() {
   const store = await cookies();
   const token = store.get(SESSION_COOKIE)?.value;
-  if (token) await env().DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await sha256(token)).run();
-  store.delete(SESSION_COOKIE);
+  try {
+    if (token) await env().DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await sha256(token)).run();
+  } finally {
+    store.delete(SESSION_COOKIE);
+  }
 }
 
 export async function loginRateLimitKey() {
