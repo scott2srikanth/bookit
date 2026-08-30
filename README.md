@@ -66,6 +66,8 @@ npm run deploy
 
 Generate `AUTH_PASSWORD_HASH` with `npm run auth:hash-password`. To enable the optional AI and Whisper features, also run `npx wrangler secret put OPENAI_API_KEY`.
 
+For dashboard deployments, add `AUTH_EMAIL` and `AUTH_PASSWORD_HASH` under **Settings → Variables and Secrets** as encrypted runtime secrets. `APP_ORIGIN` is already configured as `https://book.skrdy.com` in `wrangler.jsonc` so login origin checks work correctly behind the custom domain.
+
 Attach `book.skrdy.com` as a custom domain to the deployed `digikatha` Worker in Cloudflare. D1 is the only persistent application store; the Worker does not write to its local filesystem.
 
 ## Security model

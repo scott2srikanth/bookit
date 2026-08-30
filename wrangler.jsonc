@@ -9,6 +9,9 @@
     "binding": "ASSETS"
   },
   "observability": { "enabled": true },
+  "vars": {
+    "APP_ORIGIN": "https://book.skrdy.com"
+  },
   "d1_databases": [
     {
       "binding": "DB",

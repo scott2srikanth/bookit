@@ -1,3 +1,4 @@
 AUTH_EMAIL=writer@example.com
 AUTH_PASSWORD_HASH=run-npm-run-auth-hash-password
+APP_ORIGIN=http://127.0.0.1:3000
 OPENAI_API_KEY=

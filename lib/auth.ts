@@ -129,9 +129,19 @@ export function isSameOrigin(request: Request) {
   if (!origin) return request.method === "GET" || request.method === "HEAD";
   try {
     const originUrl = new URL(origin);
-    const expectedHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? new URL(request.url).host;
-    const expectedProtocol = request.headers.get("x-forwarded-proto") ?? new URL(request.url).protocol.replace(":", "");
-    return originUrl.host === expectedHost && originUrl.protocol === `${expectedProtocol}:`;
+    const requestUrl = new URL(request.url);
+    const configuredOrigin = env().APP_ORIGIN;
+    const allowedOrigins = new Set([requestUrl.origin]);
+    if (configuredOrigin) allowedOrigins.add(new URL(configuredOrigin).origin);
+
+    if (process.env.NODE_ENV !== "production") {
+      const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+      const host = forwardedHost ?? request.headers.get("host");
+      const protocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() ?? requestUrl.protocol.replace(":", "");
+      if (host) allowedOrigins.add(`${protocol}://${host}`);
+    }
+
+    return allowedOrigins.has(originUrl.origin);
   } catch {
     return false;
   }
