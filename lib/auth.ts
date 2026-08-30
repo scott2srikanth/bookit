@@ -126,7 +126,10 @@ export async function clearLoginFailures(key: string) {
 
 export function isSameOrigin(request: Request) {
   const origin = request.headers.get("origin");
-  if (!origin) return request.method === "GET" || request.method === "HEAD";
+  const fetchSite = request.headers.get("sec-fetch-site");
+  if (!origin) {
+    return request.method === "GET" || request.method === "HEAD" || fetchSite === "same-origin";
+  }
   try {
     const originUrl = new URL(origin);
     const requestUrl = new URL(request.url);
@@ -141,7 +144,7 @@ export function isSameOrigin(request: Request) {
       if (host) allowedOrigins.add(`${protocol}://${host}`);
     }
 
-    return allowedOrigins.has(originUrl.origin);
+    return allowedOrigins.has(originUrl.origin) || fetchSite === "same-origin";
   } catch {
     return false;
   }
