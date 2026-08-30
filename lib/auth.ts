@@ -39,7 +39,7 @@ function constantTimeEqual(left: Uint8Array, right: Uint8Array) {
 export async function verifyPassword(password: string, encoded: string) {
   const [iterationsText, saltText, expectedText] = encoded.split("$");
   const iterations = Number(iterationsText);
-  if (!Number.isSafeInteger(iterations) || iterations < 210_000 || !saltText || !expectedText) return false;
+  if (!Number.isSafeInteger(iterations) || iterations !== 100_000 || !saltText || !expectedText) return false;
   const material = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
   const derived = await crypto.subtle.deriveBits(
     { name: "PBKDF2", hash: "SHA-256", salt: base64UrlToBytes(saltText), iterations },

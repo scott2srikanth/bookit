@@ -72,7 +72,7 @@ Attach `book.skrdy.com` as a custom domain to the deployed `digikatha` Worker in
 
 ## Security model
 
-- PBKDF2-SHA256 password hashing with a unique salt and 310,000 iterations
+- PBKDF2-SHA256 password hashing with a unique salt and Cloudflare Workers' supported maximum of 100,000 iterations
 - Random 256-bit session tokens; only SHA-256 token hashes are stored
 - Production `__Host-` cookie with `Secure`, `HttpOnly`, and `SameSite=Strict`
 - Origin validation for state-changing API calls and a safe same-site redirect policy

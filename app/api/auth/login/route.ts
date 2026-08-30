@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { authConfig, checkLoginRateLimit, clearLoginFailures, createSession, loginRateLimitKey, recordLoginFailure, verifyPassword } from "@/lib/auth";
 
-const FALLBACK_PASSWORD_HASH = "310000$5aMtyXSyhGiWdA8QO_Qz_g$Qbjv40-62jboKcDVkSazJuUgktPv83k1Ht3yH4PYGvU";
+const FALLBACK_PASSWORD_HASH = "100000$dhdG2JGg-BTzmOiXahyN_A$G59kxyKA3xF0JQBkJ2fOhnToTsRmk10zw7j_WsQm5pk";
 
 export async function POST(request: Request) {
   let stage = "start";
