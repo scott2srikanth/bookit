@@ -156,7 +156,19 @@ export function isSameOrigin(request: Request) {
 
 export function authConfig() {
   const { AUTH_EMAIL, AUTH_PASSWORD_HASH } = env();
-  return { email: AUTH_EMAIL?.trim().toLowerCase(), passwordHash: AUTH_PASSWORD_HASH };
+  const cleanValue = (value: string | undefined, name: string) => {
+    let cleaned = value?.trim();
+    if (!cleaned) return undefined;
+    if (cleaned.startsWith(`${name}=`)) cleaned = cleaned.slice(name.length + 1).trim();
+    if ((cleaned.startsWith('"') && cleaned.endsWith('"')) || (cleaned.startsWith("'") && cleaned.endsWith("'"))) {
+      cleaned = cleaned.slice(1, -1);
+    }
+    return cleaned.replace(/\\\$/g, "$");
+  };
+  return {
+    email: cleanValue(AUTH_EMAIL, "AUTH_EMAIL")?.toLowerCase(),
+    passwordHash: cleanValue(AUTH_PASSWORD_HASH, "AUTH_PASSWORD_HASH"),
+  };
 }
 
 export async function authorizeApi(request: Request, requireOrigin = true) {
