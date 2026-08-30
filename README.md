@@ -46,7 +46,7 @@ Root directory: /
 Production branch: main
 ```
 
-Do not use `npm run build` as the Cloudflare build command. That produces only the Next.js output; `cloudflare:build` also creates the compiled `.open-next` Worker configuration required by the deploy phase.
+Do not use `npm run build` as the Cloudflare build command. That produces only the Next.js output; `cloudflare:build` also creates the compiled `.open-next` Worker configuration required by the deploy phase. The deploy command applies pending D1 migrations before publishing the Worker.
 
 Authenticate Wrangler and create the production D1 database once:
 

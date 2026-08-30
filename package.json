@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start -H 127.0.0.1",
     "cloudflare:build": "opennextjs-cloudflare build",
-    "cloudflare:deploy": "opennextjs-cloudflare deploy",
+    "cloudflare:deploy": "npm run db:migrate:remote && opennextjs-cloudflare deploy",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "preview:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy:cloudflare": "npm run deploy",
