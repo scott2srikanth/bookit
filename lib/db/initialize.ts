@@ -1,9 +1,7 @@
 let initialization: Promise<void> | undefined;
 
-type SchemaStatement = ReturnType<CloudflareEnv["DB"]["prepare"]>;
 type SchemaDatabase = {
-  prepare(query: string): SchemaStatement;
-  batch(statements: SchemaStatement[]): Promise<unknown[]>;
+  prepare(query: string): { run(): Promise<unknown> };
 };
 
 const schemaStatements = [
@@ -46,8 +44,9 @@ const schemaStatements = [
 ];
 
 export function ensureDatabaseSchema(database: SchemaDatabase) {
-  initialization ??= database.batch(schemaStatements.map((statement) => database.prepare(statement)))
-    .then(() => undefined)
+  initialization ??= (async () => {
+    for (const statement of schemaStatements) await database.prepare(statement).run();
+  })()
     .catch((error: unknown) => {
       initialization = undefined;
       throw error;
