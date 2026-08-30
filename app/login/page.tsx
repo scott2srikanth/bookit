@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; returnTo?: string }>;
+  searchParams: Promise<{ error?: string; returnTo?: string; stage?: string }>;
 }) {
   if (await getSession()) redirect("/");
   const query = await searchParams;
@@ -19,7 +19,7 @@ export default async function LoginPage({
           <h1 className="mt-2 text-3xl font-semibold tracking-[-.045em]">Welcome back to DigiKatha.</h1>
           <p className="mt-3 text-sm leading-6 text-black/50">Sign in to open your story shelf and manuscripts.</p>
         </div>
-        {query.error && <div role="alert" className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{query.error === "locked" ? "Too many attempts. Please wait 15 minutes." : query.error === "storage" ? "The private library could not be opened. Check the Cloudflare D1 binding and try again." : "The email or password is incorrect."}</div>}
+        {query.error && <div role="alert" className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{query.error === "locked" ? "Too many attempts. Please wait 15 minutes." : query.error === "storage" ? `The private library could not be opened. Reference: ${query.stage ?? "unknown"}.` : "The email or password is incorrect."}</div>}
         <form method="post" action="/api/auth/login" className="space-y-5">
           <input type="hidden" name="returnTo" value={returnTo} />
           <div><label className="label" htmlFor="email">Email</label><input className="field" id="email" name="email" type="email" autoComplete="username" required /></div>
