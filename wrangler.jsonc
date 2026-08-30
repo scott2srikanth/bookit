@@ -13,6 +13,9 @@
     "APP_ORIGIN": "https://book.skrdy.com",
     "AUTH_EMAIL": "srikanth@skrdy.com"
   },
+  "secrets": {
+    "required": ["AUTH_PASSWORD_HASH"]
+  },
   "d1_databases": [
     {
       "binding": "DB",
