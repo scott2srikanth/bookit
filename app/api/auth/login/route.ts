@@ -21,11 +21,20 @@ export async function POST(request: Request) {
     stage = "password-verification";
     const passwordValid = await verifyPassword(password, config.passwordHash ?? FALLBACK_PASSWORD_HASH);
     const valid = Boolean(config.email && config.passwordHash && email === config.email && passwordValid);
-    if (!limit.allowed && !valid) return NextResponse.redirect(new URL("/login?error=locked", request.url), 303);
+    const reason = !config.email
+      ? "email-missing"
+      : email !== config.email
+        ? "email-mismatch"
+        : !config.passwordHash
+          ? "hash-missing"
+          : !config.passwordHash.startsWith("100000$")
+            ? "hash-format"
+            : "hash-mismatch";
+    if (!limit.allowed && !valid) return NextResponse.redirect(new URL(`/login?error=locked&reason=${reason}`, request.url), 303);
     if (!valid) {
       stage = "rate-limit-write";
       await recordLoginFailure(key);
-      return NextResponse.redirect(new URL(`/login?error=invalid&returnTo=${encodeURIComponent(returnTo)}`, request.url), 303);
+      return NextResponse.redirect(new URL(`/login?error=invalid&reason=${reason}&returnTo=${encodeURIComponent(returnTo)}`, request.url), 303);
     }
     stage = "rate-limit-clear";
     await clearLoginFailures(key);
