@@ -34,6 +34,20 @@ Open [http://127.0.0.1:3000](http://127.0.0.1:3000). `.dev.vars` is ignored by G
 
 ## Cloudflare deployment
 
+### Cloudflare dashboard build settings
+
+For a GitHub-connected Worker, open **Workers & Pages → digikatha → Settings → Build** and use these exact values:
+
+```text
+Build command: npm run cloudflare:build
+Deploy command: npm run cloudflare:deploy
+Non-production deploy command: npx opennextjs-cloudflare upload
+Root directory: /
+Production branch: main
+```
+
+Do not use `npm run build` as the Cloudflare build command. That produces only the Next.js output; `cloudflare:build` also creates the compiled `.open-next` Worker configuration required by the deploy phase.
+
 Authenticate Wrangler and create the production D1 database once:
 
 ```bash
@@ -47,7 +61,7 @@ Copy the returned database ID into `wrangler.jsonc`, replacing `REPLACE_WITH_D1_
 npm run db:migrate:remote
 npx wrangler secret put AUTH_EMAIL
 npx wrangler secret put AUTH_PASSWORD_HASH
-npm run deploy:cloudflare
+npm run deploy
 ```
 
 Generate `AUTH_PASSWORD_HASH` with `npm run auth:hash-password`. To enable the optional AI and Whisper features, also run `npx wrangler secret put OPENAI_API_KEY`.
