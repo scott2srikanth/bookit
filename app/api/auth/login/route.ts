@@ -10,7 +10,6 @@ export async function POST(request: Request) {
     const key = await loginRateLimitKey();
     stage = "rate-limit-read";
     const limit = await checkLoginRateLimit(key);
-    if (!limit.allowed) return NextResponse.redirect(new URL("/login?error=locked", request.url), 303);
     stage = "form";
     const form = await request.formData();
     const email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 254);
@@ -22,6 +21,7 @@ export async function POST(request: Request) {
     stage = "password-verification";
     const passwordValid = await verifyPassword(password, config.passwordHash ?? FALLBACK_PASSWORD_HASH);
     const valid = Boolean(config.email && config.passwordHash && email === config.email && passwordValid);
+    if (!limit.allowed && !valid) return NextResponse.redirect(new URL("/login?error=locked", request.url), 303);
     if (!valid) {
       stage = "rate-limit-write";
       await recordLoginFailure(key);
