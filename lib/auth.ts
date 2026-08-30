@@ -1,6 +1,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { ensureDatabaseSchema } from "@/lib/db/initialize";
 
 export const SESSION_COOKIE = process.env.NODE_ENV === "production" ? "__Host-digikatha_session" : "digikatha_session";
 const SESSION_SECONDS = 60 * 60 * 24 * 30;
@@ -49,6 +50,7 @@ export async function verifyPassword(password: string, encoded: string) {
 }
 
 export async function createSession(email: string) {
+  await ensureDatabaseSchema(env().DB);
   const tokenBytes = crypto.getRandomValues(new Uint8Array(32));
   const token = bytesToBase64Url(tokenBytes);
   const tokenHash = await sha256(token);
@@ -68,6 +70,7 @@ export async function createSession(email: string) {
 }
 
 export async function getSession() {
+  await ensureDatabaseSchema(env().DB);
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token || token.length < 32) return null;
   const tokenHash = await sha256(token);
@@ -97,6 +100,7 @@ export async function loginRateLimitKey() {
 }
 
 export async function checkLoginRateLimit(key: string) {
+  await ensureDatabaseSchema(env().DB);
   const now = Date.now();
   const row = await env().DB.prepare(
     "SELECT attempts, window_started_at, blocked_until FROM login_attempts WHERE key = ?",

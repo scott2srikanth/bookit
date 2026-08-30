@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { authConfig, checkLoginRateLimit, clearLoginFailures, createSession, isSameOrigin, loginRateLimitKey, recordLoginFailure, verifyPassword } from "@/lib/auth";
+import { authConfig, checkLoginRateLimit, clearLoginFailures, createSession, loginRateLimitKey, recordLoginFailure, verifyPassword } from "@/lib/auth";
 
 const FALLBACK_PASSWORD_HASH = "310000$5aMtyXSyhGiWdA8QO_Qz_g$Qbjv40-62jboKcDVkSazJuUgktPv83k1Ht3yH4PYGvU";
 
 export async function POST(request: Request) {
-  if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
   const key = await loginRateLimitKey();
   const limit = await checkLoginRateLimit(key);
   if (!limit.allowed) return NextResponse.redirect(new URL("/login?error=locked", request.url), 303);
@@ -23,4 +22,8 @@ export async function POST(request: Request) {
   await clearLoginFailures(key);
   await createSession(email);
   return NextResponse.redirect(new URL(returnTo, request.url), 303);
+}
+
+export function GET(request: Request) {
+  return NextResponse.redirect(new URL("/login", request.url), 303);
 }
