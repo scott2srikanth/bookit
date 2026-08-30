@@ -13,7 +13,7 @@
     {
       "binding": "DB",
       "database_name": "digikatha-db",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "42676a16-12a9-4f62-9ad5-3ecc16ae8536",
       "migrations_dir": "migrations"
     }
   ]
