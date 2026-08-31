@@ -6,6 +6,15 @@ import { wordCount } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { VoiceAssistant } from "@/components/voice-assistant";
 
+function formatManuscript(value: string) {
+  return value
+    .replace(/\r\n?/g, "\n")
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim() ? `\t${paragraph.replace(/^[\t ]+/, "").trimEnd()}` : "")
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 export function Editor({
   chapterId,
   chapterPosition,
@@ -19,7 +28,7 @@ export function Editor({
   initialContent: string;
   summary: string;
 }) {
-  const [content, setContent] = useState(initialContent);
+  const [content, setContent] = useState(() => formatManuscript(initialContent));
   const [saved, setSaved] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
   const first = useRef(true);
@@ -57,7 +66,16 @@ export function Editor({
   }
 
   function appendToChapter(text: string) {
-    setContent((current) => current + (current.trim() ? "\n\n" : "") + text.trim());
+    setContent((current) => formatManuscript(current + (current.trim() ? "\n\n" : "") + text.trim()));
+  }
+
+  function handleManuscriptKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Enter" || event.shiftKey) return;
+    const field = event.currentTarget;
+    if (field.selectionStart === 0 || field.value[field.selectionStart - 1] !== "\n") return;
+    event.preventDefault();
+    field.setRangeText("\n\t", field.selectionStart, field.selectionEnd, "end");
+    setContent(field.value);
   }
 
   return (
@@ -84,16 +102,19 @@ export function Editor({
           </div>
         </div>
       )}
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 sm:py-10">
+      <div className="mx-auto w-full max-w-[46rem] flex-1 px-4 py-6 sm:px-8 sm:py-10">
         {!focusMode && <p className="mb-7 border-l-2 border-[#d9f45f] pl-4 text-sm italic leading-6 text-black/45">
           {summary || "Add a chapter summary to guide your writing."}
         </p>}
         <textarea
           value={content}
           onChange={(event) => setContent(event.target.value)}
+          onBlur={(event) => setContent(formatManuscript(event.target.value))}
+          onKeyDown={handleManuscriptKeyDown}
           aria-label="Chapter manuscript"
           placeholder="Start writing your chapter…"
-          className="min-h-[58vh] w-full resize-none bg-transparent font-serif text-[17px] leading-[1.8] text-[#292a27] outline-none sm:text-[18px] sm:leading-[1.95]"
+          spellCheck
+          className="min-h-[58vh] w-full resize-none whitespace-pre-wrap bg-transparent font-serif text-[18px] leading-[1.85] tracking-[.006em] text-[#292a27] [tab-size:2] outline-none sm:text-[19px] sm:leading-[1.9] sm:[tab-size:3]"
         />
       </div>
       <div className="border-t border-black/8 px-6 py-3 text-right text-xs text-black/40">
