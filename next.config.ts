@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: process.cwd(),
   turbopack: { root: process.cwd() },
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["book.skrdy.com"],
+    },
+  },
   async headers() {
     return [{ source: "/(.*)", headers: [
       { key: "X-Content-Type-Options", value: "nosniff" },
