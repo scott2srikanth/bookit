@@ -19,5 +19,5 @@ export default async function Layout({
   const book = (await db.select().from(books).where(eq(books.id, bookId)))[0];
   if (!book) notFound();
   const list = await db.select().from(chapters).where(eq(chapters.bookId, bookId)).orderBy(asc(chapters.position));
-  return <div className="flex h-screen overflow-hidden bg-white"><BookNav book={book} chapters={list} /><main className="min-w-0 flex-1 overflow-y-auto">{children}</main></div>;
+  return <div className="flex h-dvh overflow-hidden bg-white"><BookNav book={book} chapters={list} /><main className="min-w-0 flex-1 overflow-y-auto pt-14 lg:pt-0">{children}</main></div>;
 }

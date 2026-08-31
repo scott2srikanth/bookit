@@ -53,16 +53,16 @@ export function Editor({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-black/8 px-5 py-3">
+      <div className="flex flex-col gap-3 border-b border-black/8 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex items-center gap-2 text-xs text-black/45">
           {saved ? <><Check size={14} />Saved locally</> : <><CloudOff size={14} />Saving…</>}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
           <VoiceAssistant chapterId={chapterId} onInsert={appendToChapter} />
-          <Button variant="outline" onClick={inspire}><Sparkles size={15} />Draft with AI</Button>
+          <Button className="w-full" variant="outline" onClick={inspire}><Sparkles size={15} />Draft with AI</Button>
         </div>
       </div>
-      <div className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
+      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 sm:py-10">
         <p className="mb-7 border-l-2 border-[#d9f45f] pl-4 text-sm italic leading-6 text-black/45">
           {summary || "Add a chapter summary to guide your writing."}
         </p>
@@ -71,7 +71,7 @@ export function Editor({
           onChange={(event) => setContent(event.target.value)}
           aria-label="Chapter manuscript"
           placeholder="Start writing your chapter…"
-          className="min-h-[58vh] w-full resize-none bg-transparent font-serif text-[18px] leading-[1.95] text-[#292a27] outline-none"
+          className="min-h-[58vh] w-full resize-none bg-transparent font-serif text-[17px] leading-[1.8] text-[#292a27] outline-none sm:text-[18px] sm:leading-[1.95]"
         />
       </div>
       <div className="border-t border-black/8 px-6 py-3 text-right text-xs text-black/40">

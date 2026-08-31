@@ -208,7 +208,7 @@ export function VoiceAssistant({
 
   return (
     <>
-      <Button variant="outline" onClick={() => setOpen(true)} className="border-[#d9f45f]/80 bg-[#f9fce9]">
+      <Button variant="outline" onClick={() => setOpen(true)} className="w-full border-[#d9f45f]/80 bg-[#f9fce9]">
         <Mic size={15} />Voice Muse
       </Button>
       {open && (
