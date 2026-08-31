@@ -14,7 +14,7 @@ const BookInput = z.object({
   genre: z.string().max(80),
   audience: z.string().max(80),
   tone: z.string().max(80),
-  language: z.string().max(50),
+  language: z.enum(["English", "Hindi", "Telugu"]),
 });
 
 export async function createBook(formData: FormData) {

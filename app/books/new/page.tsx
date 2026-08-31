@@ -30,7 +30,7 @@ export default async function NewBook() {
             <Select name="genre" label="Genre" values={["Fiction", "Literary fiction", "Fantasy", "Romance", "Mystery & thriller", "Business", "Self-help", "Memoir", "Children's"]} />
             <Select name="audience" label="Audience" values={["Adult", "Young adult", "Middle grade", "Children", "Professional"]} />
             <Select name="tone" label="Writing tone" values={["Engaging", "Warm & conversational", "Literary", "Direct & practical", "Dark & atmospheric", "Playful"]} />
-            <Select name="language" label="Language" values={["English", "Spanish", "French", "German", "Portuguese", "Hindi"]} />
+            <Select name="language" label="Writing language" values={["English", "Hindi", "Telugu"]} />
           </div>
           <div className="flex flex-col-reverse items-center justify-between gap-4 border-t border-black/8 pt-6 sm:flex-row">
             <p className="flex items-center gap-2 text-xs text-black/45"><ShieldCheck size={15} />Private by design</p>

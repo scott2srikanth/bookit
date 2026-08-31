@@ -36,8 +36,8 @@ export async function POST(request: Request) {
   try {
     const result = await generateText({
       model: openai("gpt-5-mini"),
-      system: `You are DigiKatha's Voice Muse, a warm, perceptive literary collaborator. Preserve the writer's meaning and voice. Never claim authorship. Return valid JSON only with these keys: manuscriptAddition (polished prose based strictly on the spoken thought), response (2-3 warm sentences reflecting on what is compelling or unclear), questions (1-3 concise craft questions), suggestions (1-3 actionable improvements). Do not wrap the JSON in markdown.`,
-      prompt: `BOOK TITLE: ${book.title}\nGENRE: ${book.genre}\nTONE: ${book.tone}\nPREMISE: ${book.premise}\nCHAPTER: ${chapter.title}\nCHAPTER GOAL: ${chapter.summary}\nRECENT MANUSCRIPT: ${chapter.content.slice(-5000)}\nWRITER'S SPOKEN THOUGHTS: ${parsed.data.transcript}`,
+      system: `You are DigiKatha's Voice Muse, a warm, perceptive literary collaborator. Preserve the writer's meaning and voice. Never claim authorship. Return valid JSON only with these keys: manuscriptAddition (polished prose based strictly on the spoken thought, using natural paragraphs separated by blank lines), response (2-3 warm sentences reflecting on what is compelling or unclear), questions (1-3 concise craft questions), suggestions (1-3 actionable improvements). Do not use Markdown and do not wrap the JSON in markdown.`,
+      prompt: `BOOK TITLE: ${book.title}\nWRITING LANGUAGE: ${book.language}\nGENRE: ${book.genre}\nTONE: ${book.tone}\nPREMISE: ${book.premise}\nCHAPTER: ${chapter.title}\nCHAPTER GOAL: ${chapter.summary}\nRECENT MANUSCRIPT: ${chapter.content.slice(-5000)}\nWRITER'S SPOKEN THOUGHTS: ${parsed.data.transcript}\nWrite the manuscript addition and your response in ${book.language}.`,
     });
     const json = result.text.replace(/^\s*```(?:json)?|```\s*$/g, "").trim();
     const output = VoiceResult.parse(JSON.parse(json));

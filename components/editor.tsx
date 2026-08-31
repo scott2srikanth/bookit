@@ -7,22 +7,45 @@ import { Button } from "@/components/ui/button";
 import { VoiceAssistant } from "@/components/voice-assistant";
 
 function formatManuscript(value: string) {
-  return value
+  const sections = value
     .replace(/\r\n?/g, "\n")
+    .replace(/\s*\*\*([^*\n]{1,80})\*\*\s*/g, "\n\n$1\n\n")
     .split(/\n{2,}/)
-    .map((paragraph) => paragraph.trim() ? `\t${paragraph.replace(/^[\t ]+/, "").trimEnd()}` : "")
-    .filter(Boolean)
+    .map((paragraph) => paragraph.replace(/^[\t ]+/, "").trim())
+    .filter(Boolean);
+
+  return sections
+    .flatMap((paragraph) => {
+      if (paragraph.length < 520) return [paragraph];
+      const sentences = paragraph.match(/[^.!?।]+[.!?।]+(?:["'’”)\]]+)?|[^.!?।]+$/g)?.map((sentence) => sentence.trim()).filter(Boolean) ?? [paragraph];
+      const groups: string[] = [];
+      let group = "";
+      for (const sentence of sentences) {
+        group = `${group} ${sentence}`.trim();
+        if (group.length >= 360) {
+          groups.push(group);
+          group = "";
+        }
+      }
+      if (group) groups.push(group);
+      return groups;
+    })
+    .map((paragraph) => `\t${paragraph}`)
     .join("\n\n");
 }
 
 export function Editor({
   chapterId,
+  bookId,
+  initialLanguage,
   chapterPosition,
   chapterTitle,
   initialContent,
   summary,
 }: {
   chapterId: string;
+  bookId: string;
+  initialLanguage: string;
   chapterPosition: number;
   chapterTitle: string;
   initialContent: string;
@@ -30,6 +53,7 @@ export function Editor({
 }) {
   const [content, setContent] = useState(() => formatManuscript(initialContent));
   const [saved, setSaved] = useState(true);
+  const [language, setLanguage] = useState(initialLanguage);
   const [focusMode, setFocusMode] = useState(false);
   const first = useRef(true);
 
@@ -65,6 +89,17 @@ export function Editor({
     appendToChapter(data.text);
   }
 
+  async function changeLanguage(nextLanguage: string) {
+    const previous = language;
+    setLanguage(nextLanguage);
+    const response = await fetch(`/api/books/${bookId}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ language: nextLanguage }),
+    });
+    if (!response.ok) setLanguage(previous);
+  }
+
   function appendToChapter(text: string) {
     setContent((current) => formatManuscript(current + (current.trim() ? "\n\n" : "") + text.trim()));
   }
@@ -96,7 +131,8 @@ export function Editor({
               {saved ? <><Check size={14} />Saved locally</> : <><CloudOff size={14} />Saving…</>}
             </div>
             <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
-              <VoiceAssistant chapterId={chapterId} onInsert={appendToChapter} />
+              <label className="col-span-2 sm:col-span-1"><span className="sr-only">Writing language</span><select value={language} onChange={(event) => changeLanguage(event.target.value)} className="h-9 w-full rounded-md border border-black/10 bg-white px-3 text-sm outline-none focus:border-black/30" aria-label="Writing language"><option>English</option><option>Hindi</option><option>Telugu</option></select></label>
+              <VoiceAssistant chapterId={chapterId} language={language} onInsert={appendToChapter} />
               <Button className="w-full" variant="outline" onClick={inspire}><Sparkles size={15} />Draft with AI</Button>
             </div>
           </div>
@@ -114,7 +150,8 @@ export function Editor({
           aria-label="Chapter manuscript"
           placeholder="Start writing your chapter…"
           spellCheck
-          className="min-h-[58vh] w-full resize-none whitespace-pre-wrap bg-transparent font-serif text-[18px] leading-[1.85] tracking-[.006em] text-[#292a27] [tab-size:2] outline-none sm:text-[19px] sm:leading-[1.9] sm:[tab-size:3]"
+          lang={language === "Hindi" ? "hi" : language === "Telugu" ? "te" : "en"}
+          className={`manuscript-editor min-h-[58vh] w-full resize-none whitespace-pre-wrap bg-transparent text-[18px] leading-[1.85] tracking-[.006em] text-[#292a27] [tab-size:2] outline-none sm:text-[19px] sm:leading-[1.9] sm:[tab-size:3] ${language === "Hindi" ? "manuscript-hindi" : language === "Telugu" ? "manuscript-telugu" : "manuscript-english"}`}
         />
       </div>
       <div className="border-t border-black/8 px-6 py-3 text-right text-xs text-black/40">

@@ -23,8 +23,8 @@ export async function POST(req: Request) {
 
   const result = await generateText({
     model: openai("gpt-5-mini"),
-    system: "You are DigiKatha, a careful creative collaborator. Write original prose, preserve the author’s intent, avoid clichés, and return manuscript text only.",
-    prompt: `Book: ${book.title}\nGenre: ${book.genre}\nTone: ${book.tone}\nPremise: ${book.premise}\nChapter: ${chapter.title}\nChapter goal: ${chapter.summary}\nExisting text: ${chapter.content.slice(-4000)}\nContinue with 500-700 polished words.`,
+    system: "You are DigiKatha, a careful creative collaborator. Write original prose, preserve the author’s intent, avoid clichés, and return manuscript text only. Use natural paragraphs separated by blank lines. Never use Markdown headings, bold markers, labels, or commentary.",
+    prompt: `Book: ${book.title}\nLanguage: ${book.language}\nGenre: ${book.genre}\nTone: ${book.tone}\nPremise: ${book.premise}\nChapter: ${chapter.title}\nChapter goal: ${chapter.summary}\nExisting text: ${chapter.content.slice(-4000)}\nContinue with 500-700 polished words written entirely in ${book.language}.`,
   });
   return NextResponse.json({ text: result.text });
 }

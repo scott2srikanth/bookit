@@ -68,9 +68,11 @@ function mergeRecognitionParts(parts: string[]) {
 
 export function VoiceAssistant({
   chapterId,
+  language,
   onInsert,
 }: {
   chapterId: string;
+  language: string;
   onInsert: (text: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -107,7 +109,7 @@ export function VoiceAssistant({
     const recognition = new Recognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = document.documentElement.lang || "en-US";
+    recognition.lang = language === "Hindi" ? "hi-IN" : language === "Telugu" ? "te-IN" : "en-US";
     recognition.onresult = (event) => {
       const finalParts: string[] = [];
       const interimParts: string[] = [];
