@@ -59,6 +59,7 @@ export function VoiceAssistant({
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const sessionBaseRef = useRef("");
 
   useEffect(() => () => {
     recognitionRef.current?.abort();
@@ -75,20 +76,24 @@ export function VoiceAssistant({
     }
     setError("");
     setResult(null);
+    setInterim("");
+    sessionBaseRef.current = transcript.trim();
     const recognition = new Recognition();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = document.documentElement.lang || "en-US";
     recognition.onresult = (event) => {
-      let finalText = "";
-      let interimText = "";
-      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      const finalParts: string[] = [];
+      const interimParts: string[] = [];
+      for (let index = 0; index < event.results.length; index += 1) {
         const item = event.results[index];
-        if (item.isFinal) finalText += item[0].transcript + " ";
-        else interimText += item[0].transcript;
+        const phrase = item[0].transcript.trim();
+        if (!phrase) continue;
+        if (item.isFinal) finalParts.push(phrase);
+        else interimParts.push(phrase);
       }
-      if (finalText) setTranscript((current) => (current + " " + finalText).trim());
-      setInterim(interimText);
+      setTranscript([sessionBaseRef.current, ...finalParts].filter(Boolean).join(" "));
+      setInterim(interimParts.join(" "));
     };
     recognition.onerror = (event) => {
       setListening(false);
@@ -226,7 +231,7 @@ export function VoiceAssistant({
               <div className="rounded-2xl border border-black/8 bg-white p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-widest text-black/35">Your thoughts</span>
-                  {transcript && <button onClick={() => { setTranscript(""); setResult(null); }} className="text-xs text-black/40 hover:text-black">Clear</button>}
+                  {(transcript || interim) && <button onClick={() => { setTranscript(""); setInterim(""); sessionBaseRef.current = ""; setResult(null); }} className="text-xs text-black/40 hover:text-black">Clear</button>}
                 </div>
                 <textarea
                   value={transcript}
