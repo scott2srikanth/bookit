@@ -40,6 +40,32 @@ function getRecognition(): RecognitionConstructor | undefined {
   return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
 }
 
+function mergeRecognitionParts(parts: string[]) {
+  return parts.reduce((merged, part) => {
+    const next = part.trim();
+    if (!next) return merged;
+    if (!merged) return next;
+
+    const mergedWords = merged.split(/\s+/);
+    const nextWords = next.split(/\s+/);
+    const normalizedMerged = mergedWords.map((word) => word.toLocaleLowerCase());
+    const normalizedNext = nextWords.map((word) => word.toLocaleLowerCase());
+
+    if (normalizedNext.length >= normalizedMerged.length && normalizedMerged.every((word, index) => normalizedNext[index] === word)) return next;
+    if (normalizedMerged.length >= normalizedNext.length && normalizedNext.every((word, index) => normalizedMerged[index] === word)) return merged;
+
+    const overlapLimit = Math.min(normalizedMerged.length, normalizedNext.length);
+    for (let overlap = overlapLimit; overlap > 0; overlap -= 1) {
+      const mergedTail = normalizedMerged.slice(-overlap);
+      const nextHead = normalizedNext.slice(0, overlap);
+      if (mergedTail.every((word, index) => word === nextHead[index])) {
+        return [...mergedWords, ...nextWords.slice(overlap)].join(" ");
+      }
+    }
+    return `${merged} ${next}`;
+  }, "");
+}
+
 export function VoiceAssistant({
   chapterId,
   onInsert,
@@ -92,8 +118,9 @@ export function VoiceAssistant({
         if (item.isFinal) finalParts.push(phrase);
         else interimParts.push(phrase);
       }
-      setTranscript([sessionBaseRef.current, ...finalParts].filter(Boolean).join(" "));
-      setInterim(interimParts.join(" "));
+      const finalText = mergeRecognitionParts(finalParts);
+      setTranscript([sessionBaseRef.current, finalText].filter(Boolean).join(" "));
+      setInterim(mergeRecognitionParts(interimParts));
     };
     recognition.onerror = (event) => {
       setListening(false);
